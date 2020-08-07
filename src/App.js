@@ -17,11 +17,12 @@ class App extends Component {
   //Also declaring a variable to show if axois is loading the data
 
   state = {
-    search: [],
+    search: {},
     beach: [],
     mountains: [],
     forest: [],
     loading: true,
+    count: false,
   };
 
   //When all components are loaded data is fetched for the array for the default topics
@@ -56,7 +57,18 @@ class App extends Component {
         } else if (query === "forest") {
           this.setState({ forest: response.data.photos.photo, loading: false });
         } else {
-          this.setState({ search: response.data.photos.photo, loading: false });
+          /*
+            Saving every search result in the object "search".
+            This is done for the use of the browser's forward and back buttons.
+            The search query is saved as a property of the search object.
+            The value of that property is an array filled with the response-data.
+          */
+          let search = this.state.search;
+          search[query] = response.data.photos.photo;
+          this.setState({
+            search: search,
+            loading: false,
+          });
         }
       })
       .catch((err) => console.log("Error fetching and parsing data", err));
@@ -114,17 +126,24 @@ class App extends Component {
                 )
               }
             />
-            {/*If the search button is clicked with a value this path is called. Uses the search  data*/}
+            {/*
+            If the search button is clicked with a value, this path is called. Uses the search data.
+            "this.state.search" is an Object which includes the search-topics as "properties" and
+            the response-data as values in an array.
+            So the array can be called by using the bracket notation. The url-parameter "topic" 
+            is passed as the property to the object "this.state.search".
+            */}
             <Route
               path="/search/:topic"
-              render={() =>
+              render={({ match }) =>
                 this.state.loading ? (
                   <p>loading</p>
                 ) : (
-                  <Gallery data={this.state.search} />
+                  <Gallery data={this.state.search[match.params.topic]} />
                 )
               }
             />
+
             {/*If the search button is clicked without a value the "NotFound" site appears*/}
             <Route exact path="/search" component={NotFound} />
             {/*If non of the above paths matches the "FileNotFound" site appears*/}

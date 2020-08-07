@@ -4,9 +4,15 @@ import NotFound from "./NotFound";
 
 /*Creates the input of the Website*/
 const Gallery = ({ data }) => {
+  /* 
+  The array is stored in an Object. It is called by using the parameter which is passed through the URL.
+  This can lead to a typeof "undefined" on loading the page. So it is checked if the array "data" has
+  not a typeof "undefined" and is not empty. If this is true it creates an array of images by using the Photo-Component.
+  Else it uses the NotFound-Component to show the user that there is no data.
+  */
+
   let gallery;
-  //If the array is not empty it creates an array of images by using the Photo-Component
-  if (data.length > 0) {
+  if (typeof data !== "undefined" && data.length > 0) {
     gallery = data.map((photo) => (
       <Photo
         farm={photo.farm}
@@ -18,7 +24,6 @@ const Gallery = ({ data }) => {
       />
     ));
   } else {
-    //If the array is null, there was no data found. Then the "NotFound" page should appear.
     gallery = <NotFound />;
   }
 
